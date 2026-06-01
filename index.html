@@ -1,0 +1,856 @@
+# doesitAI[vbcps-ai-decision-tree.html](https://github.com/user-attachments/files/28472606/vbcps-ai-decision-tree.html)
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Should AI Be in This Lesson? — VBCPS AI Usage Level Tool</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --sand: #F5F0E8;
+    --sand-dark: #EDE6D6;
+    --ink: #1A1612;
+    --ink-2: #3D3530;
+    --ink-3: #6B6058;
+    --ink-4: #9C9088;
+    --accent: #2D5A3D;
+    --accent-light: #E8F0EB;
+    --accent-mid: #4A7C5E;
+    --red: #8B2020;
+    --red-bg: #FDF0EE;
+    --red-border: #DBA89A;
+    --red-tag: #C4705A;
+    --amber: #7A4A0A;
+    --amber-bg: #FDF6EC;
+    --amber-border: #DEB97A;
+    --amber-tag: #C09040;
+    --green: #1A4A28;
+    --green-bg: #EEF5F0;
+    --green-border: #7AAF8E;
+    --green-tag: #4A8A60;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 1px 3px rgba(26,22,18,0.08), 0 4px 16px rgba(26,22,18,0.06);
+    --shadow-card: 0 2px 8px rgba(26,22,18,0.1), 0 8px 32px rgba(26,22,18,0.08);
+  }
+
+  html { font-size: 16px; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--sand);
+    color: var(--ink);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* Header */
+  .site-header {
+    background: var(--ink);
+    color: #fff;
+    padding: 2rem 1.5rem 1.75rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .site-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 20px,
+      rgba(255,255,255,0.015) 20px,
+      rgba(255,255,255,0.015) 40px
+    );
+    pointer-events: none;
+  }
+  .header-eyebrow {
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+    margin-bottom: .5rem;
+    font-weight: 400;
+  }
+  .header-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    font-weight: 400;
+    line-height: 1.2;
+    color: #fff;
+    margin-bottom: .6rem;
+  }
+  .header-title em {
+    font-style: italic;
+    color: #A8C4B0;
+  }
+  .header-sub {
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    max-width: 480px;
+    margin: 0 auto;
+    font-weight: 300;
+  }
+  .header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 99px;
+    padding: 4px 12px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.6);
+    margin-top: 1rem;
+    letter-spacing: .04em;
+  }
+
+  /* Main layout */
+  .main {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 2rem 1rem 4rem;
+  }
+
+  /* Progress */
+  .progress-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 1.75rem;
+    background: white;
+    border-radius: var(--radius);
+    padding: .75rem 1.25rem;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(26,22,18,0.06);
+    min-height: 56px;
+    transition: opacity .3s;
+  }
+  .progress-wrap.hidden { opacity: 0; pointer-events: none; }
+  .prog-step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+  }
+  .prog-dot {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1.5px solid #D4CEC8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 500;
+    flex-shrink: 0;
+    color: var(--ink-4);
+    transition: all .25s;
+    background: transparent;
+  }
+  .prog-step.active .prog-dot {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-light);
+  }
+  .prog-step.done .prog-dot {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+    font-size: 13px;
+  }
+  .prog-label {
+    font-size: 12px;
+    color: var(--ink-4);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color .25s;
+  }
+  .prog-step.active .prog-label { color: var(--ink); font-weight: 500; }
+  .prog-step.done .prog-label { color: var(--ink-3); }
+  .prog-line {
+    height: 1px;
+    background: #D4CEC8;
+    width: 24px;
+    flex-shrink: 0;
+  }
+
+  /* Breadcrumb */
+  .crumb-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 1rem;
+    min-height: 20px;
+  }
+  .crumb {
+    font-size: 11px;
+    color: var(--ink-4);
+  }
+  .crumb.last { color: var(--ink-3); }
+  .crumb-arrow { font-size: 10px; color: #C4BEB8; }
+
+  /* Question card */
+  .q-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 1.75rem;
+    box-shadow: var(--shadow-card);
+    border: 1px solid rgba(26,22,18,0.06);
+    margin-bottom: 1rem;
+    animation: slideUp .25s ease;
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .q-eyebrow {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-4);
+    margin-bottom: .5rem;
+  }
+  .q-text {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.2rem;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1.4;
+    margin-bottom: .4rem;
+  }
+  .q-hint {
+    font-size: 13px;
+    color: var(--ink-3);
+    line-height: 1.55;
+    margin-bottom: 1.5rem;
+    font-weight: 300;
+    font-style: italic;
+  }
+  .divider {
+    height: 1px;
+    background: rgba(26,22,18,0.06);
+    margin: 0 0 1.25rem;
+  }
+
+  /* Choice buttons */
+  .choice {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    width: 100%;
+    text-align: left;
+    background: var(--sand);
+    border: 1.5px solid transparent;
+    border-radius: var(--radius-sm);
+    padding: .9rem 1.1rem;
+    margin-bottom: .6rem;
+    cursor: pointer;
+    transition: all .15s;
+    font-family: 'DM Sans', sans-serif;
+    position: relative;
+  }
+  .choice:last-child { margin-bottom: 0; }
+  .choice:hover {
+    background: white;
+    border-color: var(--accent-mid);
+    box-shadow: 0 2px 8px rgba(45,90,61,0.1);
+    transform: translateY(-1px);
+  }
+  .choice:active { transform: translateY(0); }
+  .ch-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+    box-shadow: 0 1px 3px rgba(26,22,18,0.1);
+  }
+  .ch-body { flex: 1; min-width: 0; }
+  .ch-title {
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--ink);
+    display: block;
+    margin-bottom: 2px;
+    line-height: 1.4;
+  }
+  .ch-desc {
+    font-size: 12px;
+    color: var(--ink-3);
+    line-height: 1.45;
+    display: block;
+    font-weight: 300;
+  }
+
+  /* Verdict card */
+  .verdict-card {
+    border-radius: var(--radius);
+    padding: 1.75rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-card);
+    animation: slideUp .3s ease;
+  }
+  .verdict-card.v0 { background: var(--red-bg); border: 1px solid var(--red-border); }
+  .verdict-card.v1 { background: var(--amber-bg); border: 1px solid var(--amber-border); }
+  .verdict-card.v2 { background: var(--green-bg); border: 1px solid var(--green-border); }
+
+  .level-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 99px;
+    padding: 6px 14px 6px 8px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 1rem;
+  }
+  .level-dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  }
+  .v0 .level-badge { background: rgba(139,32,32,0.1); color: var(--red); }
+  .v0 .level-dot { background: var(--red); }
+  .v1 .level-badge { background: rgba(122,74,10,0.1); color: var(--amber); }
+  .v1 .level-dot { background: #C08020; }
+  .v2 .level-badge { background: rgba(26,74,40,0.12); color: var(--green); }
+  .v2 .level-dot { background: var(--accent); }
+
+  .v-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.3rem;
+    font-weight: 400;
+    margin-bottom: .6rem;
+    line-height: 1.3;
+  }
+  .v0 .v-title { color: var(--red); }
+  .v1 .v-title { color: var(--amber); }
+  .v2 .v-title { color: var(--green); }
+
+  .v-body {
+    font-size: 13.5px;
+    line-height: 1.7;
+    margin-bottom: 1.25rem;
+    font-weight: 300;
+  }
+  .v0 .v-body { color: #5A2020; }
+  .v1 .v-body { color: #4A3010; }
+  .v2 .v-body { color: #1A3A22; }
+
+  .integrity-box {
+    border-radius: var(--radius-sm);
+    padding: .9rem 1rem;
+    margin-bottom: 1.1rem;
+    font-size: 12.5px;
+    line-height: 1.65;
+    font-weight: 300;
+  }
+  .v0 .integrity-box { background: rgba(139,32,32,0.07); border: 1px solid var(--red-border); color: #5A2020; }
+  .v1 .integrity-box { background: rgba(122,74,10,0.07); border: 1px solid var(--amber-border); color: #4A3010; }
+  .v2 .integrity-box { background: rgba(26,74,40,0.07); border: 1px solid var(--green-border); color: #1A3A22; }
+
+  .integrity-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    margin-bottom: .4rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    opacity: .7;
+  }
+
+  .tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 1rem;
+  }
+  .tag {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 9px;
+    border-radius: 99px;
+  }
+  .v0 .tag { background: rgba(139,32,32,0.1); color: var(--red); }
+  .v1 .tag { background: rgba(122,74,10,0.1); color: var(--amber); }
+  .v2 .tag { background: rgba(26,74,40,0.1); color: var(--green); }
+
+  .example-box {
+    border-radius: var(--radius-sm);
+    padding: .8rem 1rem;
+    font-size: 12.5px;
+    line-height: 1.65;
+    margin-bottom: 0;
+    font-weight: 300;
+    font-style: italic;
+  }
+  .v0 .example-box { background: rgba(139,32,32,0.05); color: #5A2020; }
+  .v1 .example-box { background: rgba(122,74,10,0.05); color: #4A3010; }
+  .v2 .example-box { background: rgba(26,74,40,0.05); color: #1A3A22; }
+  .example-box strong { font-style: normal; font-weight: 500; }
+
+  /* Reminders card */
+  .remind-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(26,22,18,0.06);
+  }
+  .remind-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: .9rem;
+  }
+  .remind-icon-wrap {
+    width: 28px;
+    height: 28px;
+    background: var(--accent-light);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    font-size: 14px;
+  }
+  .remind-title {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .remind-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 12.5px;
+    color: var(--ink-2);
+    line-height: 1.55;
+    margin-bottom: .6rem;
+    font-weight: 300;
+  }
+  .remind-row:last-child { margin-bottom: 0; }
+  .remind-row-icon {
+    color: var(--ink-4);
+    flex-shrink: 0;
+    margin-top: 2px;
+    font-size: 14px;
+  }
+
+  /* Buttons */
+  .btn-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .btn-back {
+    background: white;
+    border: 1px solid rgba(26,22,18,0.12);
+    border-radius: var(--radius-sm);
+    padding: .5rem .9rem;
+    font-size: 12.5px;
+    color: var(--ink-3);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all .15s;
+  }
+  .btn-back:hover { color: var(--ink); border-color: rgba(26,22,18,0.25); }
+  .btn-reset {
+    background: var(--ink);
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: .5rem 1.1rem;
+    font-size: 12.5px;
+    color: white;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    transition: background .15s;
+  }
+  .btn-reset:hover { background: var(--ink-2); }
+
+  /* Footer */
+  .site-footer {
+    text-align: center;
+    padding: 2rem 1rem;
+    font-size: 11px;
+    color: var(--ink-4);
+    border-top: 1px solid rgba(26,22,18,0.08);
+    margin-top: 2rem;
+    letter-spacing: .02em;
+  }
+  .site-footer a { color: var(--ink-3); text-decoration: none; }
+  .site-footer a:hover { color: var(--ink); }
+
+  @media (max-width: 480px) {
+    .prog-label { display: none; }
+    .prog-line { width: 12px; }
+    .prog-step { flex: none; }
+    .q-card, .verdict-card { padding: 1.25rem; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-eyebrow">Virginia Beach City Public Schools</div>
+  <h1 class="header-title">Should AI be in <em>this</em> lesson?</h1>
+  <p class="header-sub">A tool to help teachers determine the right AI usage level for any existing activity.</p>
+  <div class="header-badge"><i class="ti ti-traffic-lights"></i> Aligned to VBCPS Student AI Usage Levels 0 · 1 · 2</div>
+</header>
+
+<main class="main" role="main">
+  <div id="progress" class="progress-wrap hidden" aria-live="polite"></div>
+  <div id="crumbs" class="crumb-row" aria-label="Your path so far"></div>
+  <div id="content" role="region" aria-live="polite"></div>
+</main>
+
+<footer class="site-footer">
+  <p>VBCPS AI Usage Levels adapted from the work of Vera Cubero, Dr. Leon Furze, Dr. Mike Perkins, Dr. Jasper Roe FHEA &amp; Dr. Jason McVaugh &nbsp;·&nbsp; <a href="https://www.vbschools.com" target="_blank" rel="noopener">vbschools.com</a></p>
+</footer>
+
+<script>
+const STEPS = {
+  q1: {
+    step: 1,
+    eyebrow: "Question 1 of 3 — purpose of the activity",
+    q: "What is the primary purpose of this activity?",
+    hint: "Think about why you assigned this — what is it actually trying to do for the student right now?",
+    choices: [
+      { icon: "📋", title: "Check or demonstrate mastery of a specific skill or standard", desc: "A quiz, assessment, timed drill, or task where you need to see what the student can do independently", next: "q1a" },
+      { icon: "🧱", title: "Practice or build a foundational skill", desc: "Repeated practice of a discrete skill — grammar drills, math facts, vocabulary, decoding, computation", next: "q1b" },
+      { icon: "🔬", title: "Develop understanding or work through a complex problem", desc: "Students are analyzing, applying, comparing, or creating as part of a learning process", next: "q2" },
+      { icon: "🌱", title: "Build a soft skill from the graduate profile", desc: "The goal is resourcefulness, feedback, collaboration, revision, self-direction, or communication", next: "q_soft" }
+    ]
+  },
+  q1a: {
+    step: 1,
+    eyebrow: "Question 1b — device use",
+    q: "Does this mastery check need to happen on a device?",
+    hint: "Think about whether the task requires a computer or can be done with paper and pencil.",
+    choices: [
+      { icon: "✏️", title: "No — it can be done on paper", desc: "Pencil/paper, whiteboard, verbal, or physical demonstration", next: "v0_analog" },
+      { icon: "💻", title: "Yes — it must be on a device", desc: "Online assessment, digital tool, or platform-based task", next: "v0_securly" }
+    ]
+  },
+  q1b: {
+    step: 1,
+    eyebrow: "Question 1b — device use",
+    q: "Does this foundational practice need to happen on a device?",
+    hint: "Foundational skills are most protected when kept analog, but sometimes digital platforms are used for practice.",
+    choices: [
+      { icon: "✏️", title: "No — it can be done on paper or verbally", desc: "Drills, flashcards, handwriting, oral practice", next: "v0_analog" },
+      { icon: "💻", title: "Yes — it uses an online practice platform", desc: "Khan Academy, IXL, Quizlet, reading apps, etc.", next: "v0_securly" }
+    ]
+  },
+  q2: {
+    step: 2,
+    eyebrow: "Question 2 of 3 — cognitive demand",
+    q: "What is the student primarily being asked to do?",
+    hint: "Focus on the verb — the mental action, not the topic or subject.",
+    choices: [
+      { icon: "🧩", title: "Recall, identify, or reproduce information", desc: "Matching, labeling, listing facts, filling in blanks from memory", next: "q2_low" },
+      { icon: "⚙️", title: "Apply a skill or explain a concept in a structured way", desc: "Solving problems with a process, writing with a graphic organizer, following steps", next: "q2_mid" },
+      { icon: "🔭", title: "Analyze, evaluate, or create something original", desc: "Critiquing, comparing, arguing a position, synthesizing sources, designing a solution", next: "q3" }
+    ]
+  },
+  q2_low: {
+    step: 2,
+    eyebrow: "Question 2b — device use",
+    q: "Does this activity need to happen on a device?",
+    hint: "Recall-level work is best kept AI-free. The question is whether a device is necessary at all.",
+    choices: [
+      { icon: "✏️", title: "No — paper, verbal, or analog works fine", desc: "", next: "v0_analog" },
+      { icon: "💻", title: "Yes — it is on a digital platform", desc: "", next: "v0_securly" }
+    ]
+  },
+  q2_mid: {
+    step: 2,
+    eyebrow: "Question 2b — AI's role",
+    q: "If AI were present, what would it likely do for the student?",
+    hint: "Be honest — think about what would actually happen if a student had access to AI during this task.",
+    choices: [
+      { icon: "🤖", title: "Do the work for them", desc: "AI would write the explanation, solve the steps, or generate the answer — bypassing the student's thinking entirely", next: "v0_redesign" },
+      { icon: "🔧", title: "Scaffold a specific part of the process", desc: "AI could help with one defined step — checking grammar, generating examples to react to, offering a starting outline the student must revise", next: "v1_structured" }
+    ]
+  },
+  q3: {
+    step: 3,
+    eyebrow: "Question 3 of 3 — student's cognitive role",
+    q: "Where does the student's irreplaceable thinking happen?",
+    hint: "This is the part only a human can do — the judgment, the position, the original synthesis.",
+    choices: [
+      { icon: "🔍", title: "Evaluating or critiquing — including evaluating AI output", desc: "Student judges quality, accuracy, bias, or logic — AI could generate something for them to critique", next: "v1_foil" },
+      { icon: "💡", title: "Making decisions and defending a position", desc: "Student must take a stance, argue a claim, or justify choices — AI can help brainstorm but the position is theirs", next: "v1_scaffold" },
+      { icon: "✏️", title: "Creating or producing something that shows their thinking", desc: "A performance task, project, or extended piece where process and product both belong to the student", next: "q3_perf" }
+    ]
+  },
+  q3_perf: {
+    step: 3,
+    eyebrow: "Question 3b — task scope",
+    q: "How much of this task involves process across multiple steps?",
+    hint: "Bigger tasks with visible process allow more intentional AI integration than single-sitting tasks.",
+    choices: [
+      { icon: "📄", title: "Single sitting or narrow product", desc: "One essay, one test response, one completed artifact — limited visible process", next: "v1_structured" },
+      { icon: "📁", title: "Multi-step project with visible process", desc: "Drafts, research, revision cycles, feedback loops — student agency is visible across stages", next: "v2" }
+    ]
+  },
+  q_soft: {
+    step: 2,
+    eyebrow: "Question 2 of 3 — graduate profile skill",
+    q: "Which soft skill is the primary learning goal?",
+    hint: "These map to VBCPS graduate profile competencies — pick the closest fit.",
+    choices: [
+      { icon: "💬", title: "Receiving and applying feedback", desc: "Students use AI to get feedback on drafts, then must revise based on that input", next: "v1_feedback" },
+      { icon: "🤝", title: "Collaboration or peer feedback", desc: "AI supports peer review structures or models how to give constructive feedback", next: "v1_peer" },
+      { icon: "🌀", title: "Brainstorming, idea generation, or creative exploration", desc: "Students use AI to expand possibilities, then curate and build on their own ideas", next: "v1_brainstorm" },
+      { icon: "🧭", title: "Self-direction, resourcefulness, or reflection", desc: "Students use AI as a resource instead of the teacher — building independence and metacognition", next: "v2_soft" }
+    ]
+  }
+};
+
+const VERDICTS = {
+  v0_analog: {
+    level: 0, vtype: "v0",
+    title: "Level 0 — go analog",
+    body: "This activity should stay completely AI-free. Students need to rely on their own prior knowledge, research, and understanding. AI use here would violate academic integrity. Keep it on paper, verbal, or whiteboard — no devices required.",
+    integrity: { label: "Academic integrity move", icon: "ti-shield-check", text: "No devices needed — remove the opportunity entirely. Consider pencil-and-paper, oral responses, or whiteboard work. Any AI use is a violation of student academic integrity (VBCPS Level 0)." },
+    tags: ["Level 0", "No AI", "Analog", "Student thinking only"],
+    example: "Vocabulary quiz on paper, math fact timed test, reading comprehension response in a journal, oral questioning."
+  },
+  v0_securly: {
+    level: 0, vtype: "v0",
+    title: "Level 0 — lock it down with Securly",
+    body: "This activity should be AI-free even though it is on a device. Students must rely entirely on their own knowledge. Configure Securly to block AI tools including Gemini before students open their devices.",
+    integrity: { label: "Academic integrity move", icon: "ti-lock", text: "Enable Securly monitoring and block AI tools before students begin. Make Level 0 explicit in your directions: 'Any AI use on this activity is a violation of academic integrity.' Verify Securly is active before students start." },
+    tags: ["Level 0", "No AI", "Securly required", "Device-based"],
+    example: "Online quiz on a learning platform, Khan Academy practice set, digital reading assessment — all with AI blocked via Securly."
+  },
+  v0_redesign: {
+    level: 0, vtype: "v0",
+    title: "Level 0 — redesign required before AI can be added",
+    body: "Right now, AI would replace the student's thinking rather than support it. The task is vulnerable to academic dishonesty. Before AI belongs here, shift the focus from the product to the process — build in visible metacognition so you can see the student's thinking, not just AI's output.",
+    integrity: { label: "Redesign suggestion", icon: "ti-tool", text: "Shift the deliverable from a finished product to a visible process. Require annotation logs, revision histories, or reflection prompts that prove the student was the thinker. Once redesigned, run the activity through this tool again." },
+    tags: ["Level 0", "Redesign required", "Protect cognitive lift"],
+    example: "Instead of 'write a paragraph explaining this concept', try 'draft it yourself first, then use AI to check one thing you are unsure about and explain what you changed and why'."
+  },
+  v1_structured: {
+    level: 1, vtype: "v1",
+    title: "Level 1 — structured AI use with teacher-defined steps",
+    body: "AI belongs here, but you are in control of exactly when and how it is used. Design the AI interaction as a specific named step in the task — not a general permission. Students use only teacher-approved tools and must evaluate what the AI gave them and share that thinking with you and peers.",
+    integrity: { label: "Academic integrity move", icon: "ti-list-check", text: "Build disclosure into the assignment structure itself. Name the AI step explicitly (e.g., 'In step 2, use AI to generate two counterarguments. In step 3, write your rebuttal.'). Students must evaluate AI output and share their thinking — disclosure is required (VBCPS Level 1)." },
+    tags: ["Level 1", "Teacher-directed AI", "Structured disclosure", "Evaluate AI output"],
+    example: "Use AI to generate an outline for this argument. Then write the body paragraphs yourself. Attach the AI outline and annotate what you kept, changed, or rejected."
+  },
+  v1_scaffold: {
+    level: 1, vtype: "v1",
+    title: "Level 1 — AI as thinking scaffold",
+    body: "AI can reduce cognitive load on the complex-but-routine parts so the student can focus their energy on the high-level reasoning that only they can do. Define exactly which part AI supports and make the student's judgment the final product.",
+    integrity: { label: "Academic integrity move", icon: "ti-writing", text: "Pair AI scaffolding with a required reflection: 'Describe one place you disagreed with or changed the AI's suggestion and why.' This makes the student's thinking visible and non-replaceable. Level 1 disclosure is required — students must share how and where they used the tool." },
+    tags: ["Level 1", "AI as scaffold", "Student defends position", "Analyze & Evaluate"],
+    example: "Use AI to summarize the three sources. Then write your own comparison explaining where they agree, where they conflict, and what is missing. The summary is AI's; the analysis is yours."
+  },
+  v1_foil: {
+    level: 1, vtype: "v1",
+    title: "Level 1 — AI as foil or adversary",
+    body: "This is one of the strongest AI integration designs. The student's job is to out-think the AI — catch its errors, challenge its logic, and expose its bias. Pair with a fact-checking or rebuttal requirement. The AI will sometimes be confidently wrong, and that is the point.",
+    integrity: { label: "Academic integrity move", icon: "ti-target-arrow", text: "The disclosure is built into the task — students are explicitly working with AI output. Require them to evaluate the AI's accuracy, bias, or logic and submit that critique as the deliverable. Being honest about AI use IS the assignment (Level 1)." },
+    tags: ["Level 1", "AI as foil", "Critical thinking", "Evaluate"],
+    example: "Ask AI to make the strongest case for [position]. Then write a rebuttal using at least two verified sources. Attach the AI's argument and explain what it got wrong or oversimplified."
+  },
+  v1_feedback: {
+    level: 1, vtype: "v1",
+    title: "Level 1 — AI for feedback and revision",
+    body: "AI is an excellent first responder to student work. Students get immediate feedback, apply it, then reflect on what they changed. This builds the 'own their learning' and 'view setbacks as opportunities' competencies from the VBCPS graduate profile — and reduces the burden on you as the only feedback source in the room.",
+    integrity: { label: "Academic integrity move", icon: "ti-refresh", text: "The revision cycle is the integrity structure. Students submit both their original draft and revised version plus a reflection: 'What feedback did AI give? What did you change? What did you disagree with?' AI generated the feedback; the thinking and revision belong to the student (Level 1)." },
+    tags: ["Level 1", "Graduate profile", "Feedback & revision", "Soft skill"],
+    example: "Submit your first draft to AI and ask for feedback on clarity and argument strength. Apply at least two suggestions. In your final submission, explain what you changed and why."
+  },
+  v1_peer: {
+    level: 1, vtype: "v1",
+    title: "Level 1 — AI to support peer feedback",
+    body: "AI can model what good feedback looks like, help students prepare to give feedback to peers, or serve as a practice round before real peer review. This builds collaboration and communication skills from the graduate profile without replacing the human relationship in peer learning.",
+    integrity: { label: "Academic integrity move", icon: "ti-users", text: "Make the AI's role explicit: 'Use AI to practice giving feedback on a sample paragraph before giving feedback to your peer.' Students see AI as a preparation tool, not a substitute for their own judgment. Level 1 disclosure — disclose how it was used." },
+    tags: ["Level 1", "Graduate profile", "Peer feedback", "Collaboration"],
+    example: "Before peer review, use AI to practice giving feedback on a sample paragraph. Then apply that approach when reviewing your partner's work. Reflect on what was similar or different."
+  },
+  v1_brainstorm: {
+    level: 1, vtype: "v1",
+    title: "Level 1 — AI for brainstorming and idea generation",
+    body: "AI is a powerful thinking partner for generating possibilities — but the student's job is to curate, reject, and build on those ideas with their own perspective. Prompting AI well and evaluating its output are the skills being developed here. Pair with a curation requirement so student thinking is visible.",
+    integrity: { label: "Academic integrity move", icon: "ti-bulb", text: "Require students to show their selection process: 'List three ideas AI generated. Choose one, explain why you chose it over the others, and add something AI did not think of.' The brainstorm is AI's; the direction is the student's (Level 1 disclosure required)." },
+    tags: ["Level 1", "Graduate profile", "Brainstorming", "Idea curation"],
+    example: "Use AI to generate 10 possible angles for your research question. Choose 2, explain your reasoning, and add a third angle AI missed. Use your chosen angle to drive your project."
+  },
+  v2_soft: {
+    level: 2, vtype: "v2",
+    title: "Level 2 — student-directed AI, open disclosure",
+    body: "This is exactly where Level 2 belongs. The learning goal is student resourcefulness and independence — using AI as a tool rather than leaning on the teacher for every next step. Students choose their own approved tool, decide how to use it, and must be prepared to explain and evaluate their choices. This directly builds the VBCPS graduate profile: owning their learning, adapting to new tools, and taking responsibility for their process.",
+    integrity: { label: "Academic integrity move", icon: "ti-certificate", text: "Open-ended disclosure is the integrity structure. Students must clearly explain when and how they used AI, evaluate whether AI output aligned with expectations, and be prepared to discuss their choices. The process reflection is non-negotiable even when the product is AI-assisted (Level 2)." },
+    tags: ["Level 2", "Graduate profile", "Student-directed", "Open disclosure", "Resourcefulness"],
+    example: "For this project, you may use any teacher-approved AI tool at any stage. In your final submission, include a disclosure: what tool you used, where you used it, and how you evaluated its output."
+  },
+  v2: {
+    level: 2, vtype: "v2",
+    title: "Level 2 — student-directed AI across a multi-step project",
+    body: "This is a strong fit for Level 2. The task has enough visible process that student agency over AI use is appropriate and trackable. Students have full latitude to use teacher-approved tools in ways that align with course expectations — but they must evaluate AI output and be prepared to explain every choice they made.",
+    integrity: { label: "Academic integrity move", icon: "ti-file-description", text: "Build open-ended disclosure into the project structure as a required component — not an afterthought. Students submit: what AI tools they used, at which stages, what AI generated, and how they evaluated and modified that output. Disclosure demonstrates academic integrity (Level 2)." },
+    tags: ["Level 2", "Multi-step project", "Student-directed", "Create", "Open disclosure"],
+    example: "Across all stages of this project, you may use teacher-approved AI tools. Your final submission must include an AI use disclosure: when you used it, what it produced, and how your judgment shaped the final work."
+  }
+};
+
+let history = [];
+const stepLabels = ["Purpose", "Cognitive demand", "Student role"];
+
+function renderProgress(activeStep) {
+  const el = document.getElementById('progress');
+  if (!activeStep || activeStep < 1) {
+    el.classList.add('hidden');
+    return;
+  }
+  el.classList.remove('hidden');
+  el.innerHTML = stepLabels.map((l, i) => {
+    const n = i + 1;
+    const cls = n < activeStep ? 'done' : n === activeStep ? 'active' : '';
+    const check = n < activeStep ? '<i class="ti ti-check" aria-hidden="true"></i>' : n;
+    return `${i > 0 ? '<div class="prog-line"></div>' : ''}
+    <div class="prog-step ${cls}" aria-current="${n === activeStep ? 'step' : 'false'}">
+      <div class="prog-dot">${check}</div>
+      <span class="prog-label">${l}</span>
+    </div>`;
+  }).join('');
+}
+
+function renderCrumbs() {
+  const el = document.getElementById('crumbs');
+  const labels = {
+    q1: 'Purpose', q2: 'Cognitive demand', q3: 'Student role',
+    q_soft: 'Soft skill goal', q1a: 'Mastery check', q1b: 'Foundational practice',
+    q2_low: 'Recall level', q2_mid: 'Application level', q3_perf: 'Performance task'
+  };
+  const parts = history.filter(h => labels[h]);
+  if (!parts.length) { el.innerHTML = ''; return; }
+  el.innerHTML = parts.map((h, i) => {
+    const last = i === parts.length - 1;
+    return `<span class="crumb ${last ? 'last' : ''}">${labels[h]}</span>${!last ? '<span class="crumb-arrow">›</span>' : ''}`;
+  }).join('');
+}
+
+function render(key) {
+  renderCrumbs();
+  const el = document.getElementById('content');
+
+  if (VERDICTS[key]) {
+    const v = VERDICTS[key];
+    renderProgress(null);
+    const circle = v.level === 0 ? '0' : v.level === 1 ? '1' : '2';
+    el.innerHTML = `
+      <div class="verdict-card ${v.vtype}" role="region" aria-label="Your result: Level ${v.level}">
+        <div class="level-badge">
+          <div class="level-dot" aria-hidden="true">${circle}</div>
+          VBCPS AI Level ${v.level}
+        </div>
+        <div class="v-title">${v.title}</div>
+        <div class="v-body">${v.body}</div>
+        <div class="integrity-box">
+          <div class="integrity-label"><i class="ti ${v.integrity.icon}" aria-hidden="true"></i> ${v.integrity.label}</div>
+          ${v.integrity.text}
+        </div>
+        <div class="tag-row" aria-label="Tags">${v.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+        <div class="example-box"><strong>Classroom example:</strong> ${v.example}</div>
+      </div>
+      <div class="remind-card">
+        <div class="remind-header">
+          <div class="remind-icon-wrap"><i class="ti ti-alert-circle" aria-hidden="true"></i></div>
+          <span class="remind-title">High school AI reminders</span>
+        </div>
+        <div class="remind-row"><i class="ti ti-brain remind-row-icon" aria-hidden="true"></i>AI is a tool, not your brain — don't let it replace student thinking, problem-solving, or creativity</div>
+        <div class="remind-row"><i class="ti ti-eye remind-row-icon" aria-hidden="true"></i>Think critically — AI only gives a starting point; always question its accuracy, reliability, and completeness</div>
+        <div class="remind-row"><i class="ti ti-shield-check remind-row-icon" aria-hidden="true"></i>Use AI responsibly — properly acknowledging AI use demonstrates a commitment to academic integrity</div>
+        <div class="remind-row"><i class="ti ti-user-shield remind-row-icon" aria-hidden="true"></i>Protect privacy — never share personal details about yourself or others when using AI</div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-back" onclick="goBack()"><i class="ti ti-arrow-left" aria-hidden="true"></i> Back</button>
+        <button class="btn-reset" onclick="reset()">Audit a different activity</button>
+      </div>`;
+    return;
+  }
+
+  if (STEPS[key]) {
+    const s = STEPS[key];
+    renderProgress(s.step);
+    el.innerHTML = `
+      <div class="q-card" role="region" aria-label="${s.q}">
+        <div class="q-eyebrow">${s.eyebrow}</div>
+        <div class="q-text">${s.q}</div>
+        ${s.hint ? `<div class="q-hint">${s.hint}</div>` : ''}
+        <div class="divider"></div>
+        ${s.choices.map(c => `
+          <button class="choice" onclick="choose('${key}','${c.next}')" aria-label="${c.title}">
+            <div class="ch-icon" aria-hidden="true">${c.icon}</div>
+            <div class="ch-body">
+              <span class="ch-title">${c.title}</span>
+              ${c.desc ? `<span class="ch-desc">${c.desc}</span>` : ''}
+            </div>
+            <i class="ti ti-chevron-right" style="color:var(--ink-4);flex-shrink:0;font-size:14px;margin-top:2px" aria-hidden="true"></i>
+          </button>`).join('')}
+      </div>
+      ${history.length ? `<div class="btn-row"><button class="btn-back" onclick="goBack()"><i class="ti ti-arrow-left" aria-hidden="true"></i> Back</button></div>` : ''}`;
+  }
+}
+
+function choose(from, next) {
+  history.push(from);
+  render(next);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goBack() {
+  const prev = history.pop();
+  render(prev);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function reset() {
+  history = [];
+  render('q1');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+render('q1');
+</script>
+</body>
+</html>
